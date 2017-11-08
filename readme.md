@@ -143,7 +143,7 @@ setTimeout(function(){
           },
           {
             name: 'rules-21',
-            path: '*auth*',
+            path: '/auth*',
             handler: __handleRequest21.bind(__handleRequest21)
           },
           {

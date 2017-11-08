@@ -270,14 +270,12 @@ describe('wild-proxy-functional-tests', function () {
     var server1 = http.createServer(function(req, res) {
 
       var message = 'echo: ' + req.url + ', steps: ' + steps[req.url].join(',');
-      //console.log(message);
       res.end(message);
     });
 
     var server2 = http.createServer(function(req, res) {
 
       var message = 'echo: ' + req.url + ', steps: ' + steps[req.url].join(',');
-      //console.log(message);
       res.end(message);
     });
 
@@ -381,7 +379,7 @@ describe('wild-proxy-functional-tests', function () {
               },
               {
                 name: 'rules-21',
-                path: '*auth*',
+                path: '/auth*',
                 handler: __handleRequest21.bind(__handleRequest21)
               },
               {
@@ -478,14 +476,12 @@ describe('wild-proxy-functional-tests', function () {
     var server1 = http.createServer(function(req, res) {
 
       var message = 'echo: ' + req.url + ', steps: ' + steps[req.url].join(',');
-      //console.log(message);
       res.end(message);
     });
 
     var server2 = http.createServer(function(req, res) {
 
       var message = 'echo: ' + req.url + ', steps: ' + steps[req.url].join(',');
-      //console.log(message);
       res.end(message);
     });
 
@@ -589,7 +585,7 @@ describe('wild-proxy-functional-tests', function () {
               },
               {
                 name: 'rules-21',
-                path: '*auth*',
+                path: '/auth*',
                 handler: __handleRequest21.bind(__handleRequest21)
               },
               {

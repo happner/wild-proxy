@@ -1,6 +1,6 @@
 {
   "name": "wild-proxy",
-  "version": "3.1.1",
+  "version": "4.0.0",
   "scripts": {
     "test": "mocha test"
   },
@@ -16,6 +16,6 @@
     "async": "2.5.0",
     "http-proxy": "1.16.2",
     "redis-lru-cache": "0.1.0",
-    "wild-pare": "4.2.2"
+    "wild-pare": "5.0.0"
   }
 }

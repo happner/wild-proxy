@@ -208,7 +208,6 @@ describe('wild-proxy-integration-tests', function () {
         .catch(done);
 
     }, 2000);
-
   });
 
   it('test the config options, does an end-to-end http proxy run, confirms the steps', function (done) {

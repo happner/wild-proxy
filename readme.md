@@ -17,218 +17,209 @@ npm i wild-proxy --save
 
 ```javascript
 
-var steps = {};
+it('test the config options, does an end-to-end http proxy run, confirms we can prevent proxying by a step in the middle', function (done) {
 
-var http = require('http');
+    this.timeout(25000);
 
-//start up some servers
+    var steps = {};
 
-var server1 = http.createServer(function(req, res) {
+    var http = require('http');
 
-  var message = 'echo: ' + req.url + ', steps: ' + steps[req.url].join(',');
-  //console.log(message);
-  res.end(message);
-});
+    var server1 = http.createServer(function(req, res) {
 
-var server2 = http.createServer(function(req, res) {
+      var message = 'echo: ' + req.url + ', steps: ' + steps[req.url].join(',');
+      res.end(message);
+    });
 
-  var message = 'echo: ' + req.url + ', steps: ' + steps[req.url].join(',');
-  //console.log(message);
-  res.end(message);
-});
+    var server2 = http.createServer(function(req, res) {
 
-server1.listen(55554);
+      var message = 'echo: ' + req.url + ', steps: ' + steps[req.url].join(',');
+      res.end(message);
+    });
 
-server2.listen(44443);
+    server1.listen(55554);
 
-//wait 2 seconds
+    server2.listen(44443);
 
-setTimeout(function(){
+    setTimeout(function(){
 
-  //define some handlers
+      var __handleRequest1 = function (req, res, $happn, rule) {
 
-  var __handleRequest1 = function (req, res, $happn, rule) {
+        return new Promise(function(resolve){
+          if (!steps[req.url]) steps[req.url] = [];
+          steps[req.url].push(rule.name);
+          return resolve();
+        })
+      };
 
-    return new Promise(function(resolve){
-      if (!steps[req.url]) steps[req.url] = [];
-      steps[req.url].push(rule.name);
-      return resolve();
-    })
-  };
+      var __handleRequest2 = function (req, res, $happn, rule) {
 
-  var __handleRequest2 = function (req, res, $happn, rule) {
+        return new Promise(function(resolve){
+          if (!steps[req.url]) steps[req.url] = [];
+          steps[req.url].push(rule.name);
+          return resolve();
+        })
+      };
 
-    return new Promise(function(resolve){
-      if (!steps[req.url]) steps[req.url] = [];
-      steps[req.url].push(rule.name);
-      return resolve();
-    })
-  };
+      var __handleRequest21 = function (req, res, $happn, rule) {
 
-  var __handleRequest21 = function (req, res, $happn, rule) {
+        return new Promise(function(resolve){
+          if (!steps[req.url]) steps[req.url] = [];
+          steps[req.url].push(rule.name);
+          return resolve();
+        })
+      };
 
-    return new Promise(function(resolve){
-      if (!steps[req.url]) steps[req.url] = [];
-      steps[req.url].push(rule.name);
-      return resolve();
-    })
-  };
+      var __handleBadRequest = function (req, res, $happn, rule) {
 
-  var __handleRequest22 = function (req, res, $happn, rule) {
+        return new Promise(function(resolve){
 
-    return new Promise(function(resolve){
-      if (!steps[req.url]) steps[req.url] = [];
-      steps[req.url].push(rule.name);
-      return resolve();
-    })
-  };
+          if (!steps[req.url]) steps[req.url] = [];
 
-  var __handleRequest23 = function (req, res, $happn, rule) {
+          steps[req.url].push(rule.name);
 
-    return new Promise(function(resolve){
-      if (!steps[req.url]) steps[req.url] = [];
-      steps[req.url].push(rule.name);
-      return resolve();
-    })
-  };
+          var message = 'bad: ' + req.url + ', steps: ' + steps[req.url].join(',');
 
-  var __handleBadRequest = function (req, res, $happn, rule) {
+          res.end(message);
 
-    return new Promise(function(resolve){
+          return resolve(true);
+        })
+      };
 
-      if (!steps[req.url]) steps[req.url] = [];
+      var __handleRequest22 = function (req, res, $happn, rule) {
 
-      steps[req.url].push(rule.name);
+        return new Promise(function(resolve){
+          if (!steps[req.url]) steps[req.url] = [];
+          steps[req.url].push(rule.name);
+          return resolve();
+        })
+      };
 
-      return resolve();
-    })
-  };
+      var __handleRequest23 = function (req, res, $happn, rule) {
 
-  var listener1 = {
-    name: 'listener-1',
-    port: 55555,
-    protocol: 'http',
-    target: 'http://localhost:55554',
-    rule: 'rules-1'
-  };
+        return new Promise(function(resolve){
+          if (!steps[req.url]) steps[req.url] = [];
+          steps[req.url].push(rule.name);
+          return resolve();
+        })
+      };
 
-  var listener2 = {
-    name: 'listener-2',
-    port: 44444,
-    protocol: 'http',
-    target: 'http://localhost:44443',
-    rule: 'rules-2'
-  };
 
-  //set up the proxy config
 
-  var wildProxyConfig = {
+      var listener1 = {
+        name: 'listener-1',
+        port: 55555,
+        protocol: 'http',
+        target: 'http://localhost:55554',
+        rule: 'rules-1'
+      };
 
-    listeners: [listener1, listener2],
-    rules: [
-      {
-        name: 'rules-1',
-        path: '*',
-        handler: __handleRequest1.bind(__handleRequest1),
-        terminate: true
-      },
-      {
-        name: 'rules-2',
-        steps: [
+      var listener2 = {
+        name: 'listener-2',
+        port: 44444,
+        protocol: 'http',
+        target: 'http://localhost:44443',
+        rule: 'rules-2'
+      };
+
+      var wildProxyConfig = {
+
+        listeners: [listener1, listener2],
+        rules: [
           {
-            name: 'rules-20',
-            path: '/auth?*',
-            handler: __handleRequest2.bind(__handleRequest2),
-            terminate: true//if this rule is activated, dont proceed to follow on rules
-          },
-          {
-            name: 'rules-21',
-            path: '/auth*',
-            handler: __handleRequest21.bind(__handleRequest21)
-          },
-          {
-            name: 'rules-22',
-            path: '/dashboards?*',
-            handler: __handleRequest22.bind(__handleRequest22),
-            terminate: true
-          },
-          {
-            name: 'rules-23',
-            path: '/app/kibana*',
-            handler: __handleRequest23.bind(__handleRequest23),
-            terminate: true
-          },
-          {
-            name: 'rules-bad',
+            name: 'rules-1',
             path: '*',
-            handler: __handleBadRequest.bind(__handleBadRequest)
+            handler: __handleRequest1.bind(__handleRequest1),
+            terminate: true
+          },
+          {
+            name: 'rules-2',
+            steps: [
+              {
+                name: 'rules-20',
+                path: '/auth?*',
+                handler: __handleRequest2.bind(__handleRequest2),
+                terminate: true
+              },
+              {
+                name: 'rules-21',
+                path: '/auth*',
+                handler: __handleRequest21.bind(__handleRequest21)
+              },
+              {
+                name: 'rules-22',
+                path: '/dashboards?*',
+                handler: __handleRequest22.bind(__handleRequest22),
+                terminate: true
+              },
+              {
+                name: 'rules-bad',
+                path: '*',
+                handler: __handleBadRequest.bind(__handleBadRequest)
+              },
+              {
+                name: 'rules-23',
+                path: '/app/kibana*',
+                handler: __handleRequest23.bind(__handleRequest23),
+                terminate: true
+              }
+            ]
           }
         ]
-      }
-    ]
-  };
+      };
 
-  //instantiate our proxy
-  var wildProxy = require('wild-proxy').create(wildProxyConfig);
+      var wildProxy = require('..').create(wildProxyConfig);
 
-  var randomString = testUtilities.string();
+      var randomString = testUtilities.string();
 
-  //listen
-  wildProxy.listen()
-
-    .then(function(){
-
-      return testUtilities.doRequest('http', '127.0.0.1', 55555, '/' + randomString, null);
-    })
-
-    .then(function(response){
-
-      expect(response.body.toString()).to.be('echo: /' + randomString + ', steps: rules-1');
-
-      return testUtilities.doRequest('http', '127.0.0.1', 44444, '/auth?' + randomString, null);
-    })
-
-    .then(function(response){
-
-      expect(response.body.toString()).to.be('echo: /auth?' + randomString + ', steps: rules-20');
-
-      return testUtilities.doRequest('http', '127.0.0.1', 44444, '/dashboards?' + randomString, null);
-    })
-
-    .then(function(response){
-
-      expect(response.body.toString()).to.be('echo: /dashboards?' + randomString + ', steps: rules-22');
-
-      return testUtilities.doRequest('http', '127.0.0.1', 44444, '/app/kibana/' + randomString, null);
-    })
-
-    .then(function(response){
-
-      expect(response.body.toString()).to.be('echo: /app/kibana/' + randomString + ', steps: rules-23');
-
-      return testUtilities.doRequest('http', '127.0.0.1', 44444, '/bad/' + randomString, null);
-    })
-
-    .then(function(response){
-
-      expect(response.body.toString()).to.be('echo: /bad/' + randomString + ', steps: rules-bad');
-
-      wildProxy.stop()
+      wildProxy.listen()
 
         .then(function(){
 
-          server1.close();
+          return testUtilities.doRequest('http', '127.0.0.1', 55555, '/' + randomString, null);
+        })
 
-          server2.close();
+        .then(function(response){
 
-          setTimeout(done, 1000);
+          expect(response.body.toString()).to.be('echo: /' + randomString + ', steps: rules-1');
 
-        }).catch(done);
-    })
+          return testUtilities.doRequest('http', '127.0.0.1', 44444, '/auth?' + randomString, null);
+        })
 
-    .catch(done);
+        .then(function(response){
 
-}, 2000);
+          expect(response.body.toString()).to.be('echo: /auth?' + randomString + ', steps: rules-20');
+
+          return testUtilities.doRequest('http', '127.0.0.1', 44444, '/dashboards?' + randomString, null);
+        })
+
+        .then(function(response){
+
+          expect(response.body.toString()).to.be('echo: /dashboards?' + randomString + ', steps: rules-22');
+
+          return testUtilities.doRequest('http', '127.0.0.1', 44444, '/app/kibana/' + randomString, null);
+        })
+
+        .then(function(response){
+
+          expect(response.body.toString()).to.be('bad: /app/kibana/' + randomString + ', steps: rules-bad');
+
+          wildProxy.stop()
+            .then(function(){
+
+              server1.close();
+
+              server2.close();
+
+              setTimeout(done, 1000);
+
+            }).catch(done);
+        })
+
+        .catch(done);
+
+    }, 2000);
+  });
 
 ```
 

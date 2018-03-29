@@ -67,6 +67,10 @@ describe('wild-proxy-integration-tests', function () {
 
           steps[req.url].push(rule.name);
 
+          var message = 'bad: ' + req.url + ', steps: ' + steps[req.url].join(',');
+
+          res.end(message);
+
           return resolve(true);
         })
       };
@@ -167,7 +171,7 @@ describe('wild-proxy-integration-tests', function () {
         .then(function(response){
 
           expect(response.body.toString()).to.be('echo: /' + randomString + ', steps: rules-1');
-
+          
           return testUtilities.doRequest('http', '127.0.0.1', 44444, '/auth?' + randomString, null);
         })
 
@@ -187,7 +191,7 @@ describe('wild-proxy-integration-tests', function () {
 
         .then(function(response){
 
-          expect(response.body.toString()).to.be('echo: /app/kibana/' + randomString + ', steps: rules-bad');
+          expect(response.body.toString()).to.be('bad: /app/kibana/' + randomString + ', steps: rules-bad');
 
           wildProxy.stop()
             .then(function(){
